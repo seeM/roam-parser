@@ -1,3 +1,4 @@
 {:deps {com.atlassian.commonmark/commonmark {:mvn/version "0.16.1"}
-        com.atlassian.commonmark/commonmark-ext-gfm-strikethrough {:mvn/version "0.16.1"}}
+        com.atlassian.commonmark/commonmark-ext-gfm-strikethrough {:mvn/version "0.16.1"}
+        instaparse/instaparse {:mvn/version "1.4.10"}}
  :path ["src"]}
