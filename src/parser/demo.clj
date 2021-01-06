@@ -2,18 +2,30 @@
   (:require [clojure.test :refer [deftest is]]
             [instaparse.core :as insta]))
 
-(def roam-text "_~~**strike** through~~_
-((ref))
+(def roam-text "
+Basics:
+
 [[link]]
-[[nested [[link]]]]
-[alias]([[link]])")
+((ref))
+{{roam-render}}
+$$latex$$
+[alias](target)
+
+Recursive:
+
+[[Nested [[Links]]]]
+^^**bold highlights**^^
+[html roam]([[Aliases]])
+[![img](image-as-alias.com)](www.roamresearch.com)
+[**bold__italics^^[[highlight]]^^__**](url)
+")
 
 (def parser
   (insta/parser "
      doc = inline+
 
      (* inlines *)
-     <inline> = str | space | symbol | endline | symbol-inline
+     <inline>        = str | space | symbol | endline | symbol-inline
      <symbol-inline> = image | alias | bold | italic | highlight | code | link | ref | roam-render | latex
 
      (* text *)
@@ -31,10 +43,10 @@
      target          = <'('> (link | !link ( !'(' !')' nonspace-char)+ ) <')'>
 
      (* styles *)
-     bold      = <'**'> !whitespace (!'**' inline)+ <'**'>
-     italic    = <'__'> !whitespace (!'__' inline)+ <'__'>
-     highlight = <'^^'> !whitespace (!'^^' inline)+ <'^^'>
-     code      =  <'`'> !whitespace (!'`' any-char)+ <'`'>
+     bold         = <'**'> !whitespace (!'**' inline)+ <'**'>
+     italic       = <'__'> !whitespace (!'__' inline)+ <'__'>
+     highlight    = <'^^'> !whitespace (!'^^' inline)+ <'^^'>
+     code         =  <'`'> !whitespace (!'`' any-char)+ <'`'>
      <whitespace> = space-char | newline
 
      (* other *)
