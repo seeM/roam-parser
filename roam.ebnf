@@ -1,39 +1,38 @@
 block = inline+
 
 (* inlines *)
-<inline> = str | space | symbol-inline | symbol
+<inline>        = str | space | symbol-inline | symbol
 <symbol-inline> = bold | italic | highlight |
                   roam-render |
-                  latex | ref | link |
+                  latex | ref | link | tag |
                   image | alias
 
 (* text *)
-<str>             = normal-chars
-<space>           = space-chars
-<symbol>          = !symbol-inline symbol-char
+<str>    = normal-chars
+<space>  = space-chars
+<symbol> = !symbol-inline symbol-char
 
 (* alias *)
-alias            = alias-content
-image            = <'!'> alias-content
-<alias-content>  = label target
-label            = <'['> (!']' !alias inline)* <']'>
-target           = <'('> (link | !link nonspace-chars) <')'>
+alias           = alias-content
+image           = <'!'> alias-content
+<alias-content> = label target
+label           = <'['> (!']' !alias inline)* <']'>
+target          = <'('> (link | !link #'[^\(\)\s]+') <')'>
 
 (* styles *)
-bold         = <'**'> !space-char (!'**' inline)+ <'**'>
-italic       = <'__'> !space-char (!'__' inline)+ <'__'>
-highlight    = <'^^'> !space-char (!'^^' inline)+ <'^^'>
-code         =  <'`'> !space-char #'[^`]+' <'`'>
+bold      = <'**'> (!'**' inline)+ <'**'>
+italic    = <'__'> (!'__' inline)+ <'__'>
+highlight = <'^^'> (!'^^' inline)+ <'^^'>
+code      =  <'`'> #'[^`]+' <'`'>
 
 (* other *)
-link        = <'[['> (!link #'((?!(\[\[|\]\])).)+' | link)+ <']]'>
+link        = <'[['> (link | !link #'((?!(\[\[|\]\])).)+')+ <']]'>
 ref         = <'(('> #'[a-zA-Z0-9]*' <'))'>
-roam-render = <'{{'> (!roam-render #'((?!(\{\{|\}\})).)+' | roam-render)+ <'}}'>
-latex       =  <'$$'> !space-char #'((?!\$\$).)+' <'$$'>
+roam-render = <'{{'> (roam-render | !roam-render #'((?!(\{\{|\}\})).)+')+ <'}}'>
+latex       = <'$$'> #'((?!\$\$).)+' <'$$'>
+tag         = <'#'> (link | !link #'[a-zA-Z0-9@\\/_\-]+')
 
-(* characters and tokens *)
-<symbol-char>   = #'[*_^`|\[\]!{}$()]'
-<normal-chars>  = #'[^*_^`|\[\]!{}$()\s]*'
-<space-chars>   = #'\s+'
-<nonspace-chars> = #'[^\(\)\s]+'
-<space-char> = #'\s'
+(* characters *)
+<symbol-char>    = #'[*_^`|\[\]!{}$()#]'
+<normal-chars>   = #'[^*_^`|\[\]!{}$()\s#]*'
+<space-chars>    = #'\s+'

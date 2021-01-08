@@ -5,6 +5,10 @@
 (def roam-text "
 Basics:
 
+#a-tag_qwe/123\\123
+#tag$not-part-of-it
+#[[a[[tag]]]]
+
 [[link]]
 ((ref))
 {{roam-render}}
@@ -48,4 +52,4 @@ Recursive:
 (defn -main []
   ; (time (pprint (parse roam-text)))
   (time (pprint (parse roam-text))))
-  ; (time (parse roam-text)))
+  ; (time (parse "#a-tag_qwe/123\\123")))
