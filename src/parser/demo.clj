@@ -1,6 +1,5 @@
 (ns parser.demo
   (:require [clojure.pprint :refer [pprint]]
-            [clojure.test :refer [deftest is]]
             [instaparse.core :as insta]))
 
 (def roam-text "
@@ -47,13 +46,6 @@ Recursive:
     (apply insta/parses parser s args)))
 
 (defn -main []
-  (time (pprint (parse "[an alias [[link[[[[ **bold**](url)" :unhide :all))))
-
-(deftest test-parse
-  ; (is (= (parse "[alias](url)") ["foo"]))
-  ; (is (= (parse "[alias]([[page]])") ["foo"]))
-  (is (= (parse "[an alias [[link] **bold**](url)") []))
-  ; (is (= (parse "[[link[[deeply[[nested") []))
-  ; (is (= (parse "_~~**strike** through~~_\nfoo") ["foo"]))
-  ; (is (= (parse "\n\n\n  alkwejr \n ") ["foo"]))
-  )
+  ; (time (pprint (parse roam-text)))
+  (time (pprint (parse roam-text))))
+  ; (time (parse roam-text)))

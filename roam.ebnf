@@ -1,0 +1,39 @@
+block = inline+
+
+(* inlines *)
+<inline> = str | space | symbol-inline | symbol
+<symbol-inline> = bold | italic | highlight |
+                  roam-render |
+                  latex | ref | link |
+                  image | alias
+
+(* text *)
+<str>             = normal-chars
+<space>           = space-chars
+<symbol>          = !symbol-inline symbol-char
+
+(* alias *)
+alias            = alias-content
+image            = <'!'> alias-content
+<alias-content>  = label target
+label            = <'['> (!']' !alias inline)* <']'>
+target           = <'('> (link | !link nonspace-chars) <')'>
+
+(* styles *)
+bold         = <'**'> !space-char (!'**' inline)+ <'**'>
+italic       = <'__'> !space-char (!'__' inline)+ <'__'>
+highlight    = <'^^'> !space-char (!'^^' inline)+ <'^^'>
+code         =  <'`'> !space-char #'[^`]+' <'`'>
+
+(* other *)
+link        = <'[['> (!link #'((?!(\[\[|\]\])).)+' | link)+ <']]'>
+ref         = <'(('> #'[a-zA-Z0-9]*' <'))'>
+roam-render = <'{{'> (!roam-render #'((?!(\{\{|\}\})).)+' | roam-render)+ <'}}'>
+latex       =  <'$$'> !space-char #'((?!\$\$).)+' <'$$'>
+
+(* characters and tokens *)
+<symbol-char>   = #'[*_^`|\[\]!{}$()]'
+<normal-chars>  = #'[^*_^`|\[\]!{}$()\s]*'
+<space-chars>   = #'\s+'
+<nonspace-chars> = #'[^\(\)\s]+'
+<space-char> = #'\s'
