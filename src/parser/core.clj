@@ -1,11 +1,17 @@
 (ns parser.core
-  (:require [parser.strikethrough :refer [strikethrough-extension]])
+  (:require [parser.strikethrough :refer [strikethrough-extension]]
+            [parser.ref :refer [ref-extension]]
+            [parser.link :refer [link-extension]])
   (:import
     (org.commonmark.parser Parser)
     (org.commonmark.renderer.html HtmlRenderer)
     (org.commonmark.renderer.text TextContentRenderer)))
 
-(def extensions [(strikethrough-extension)])
+(def extensions [
+                 (strikethrough-extension)
+                 (ref-extension)
+                 (link-extension)
+                 ])
 
 (def parser
   (-> (Parser/builder)

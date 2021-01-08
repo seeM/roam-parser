@@ -1,5 +1,6 @@
 (ns parser.demo
-  (:require [clojure.test :refer [deftest is]]
+  (:require [clojure.pprint :refer [pprint]]
+            [clojure.test :refer [deftest is]]
             [instaparse.core :as insta]))
 
 (def roam-text "
@@ -21,51 +22,7 @@ Recursive:
 ")
 
 (def parser
-  (insta/parser "
-     doc = inline+
-
-     (* inlines *)
-     <inline>        = str | space | symbol | endline | symbol-inline
-     <symbol-inline> = image | alias | bold | italic | highlight | code | link | ref | roam-render | latex
-
-     (* text *)
-     str     = normal-char+ !normal-char
-     space   = space-char+ !space-char
-     symbol  = !symbol-inline special-char
-     (* NOTE: could probably treat endline as space, because no Roam syntax depends on it *)
-     endline = newline
-
-     (* alias *)
-     alias           = alias-content
-     image           = <'!'> alias-content
-     <alias-content> = label target
-     label           = <'['> (!']' inline)* <']'>
-     target          = <'('> (link | !link ( !'(' !')' nonspace-char)+ ) <')'>
-
-     (* styles *)
-     bold         = <'**'> !whitespace (!'**' inline)+ <'**'>
-     italic       = <'__'> !whitespace (!'__' inline)+ <'__'>
-     highlight    = <'^^'> !whitespace (!'^^' inline)+ <'^^'>
-     code         =  <'`'> !whitespace (!'`' any-char)+ <'`'>
-     <whitespace> = space-char | newline
-
-     (* other *)
-     link        = <'[['> ( (!link !']]' any-char)+ | link )+ <']]'>
-     ref         = <'(('> (!'))' alphanumeric)+ <'))'>
-     roam-render = <'{{'> !whitespace ( (!'{{' any-char)+ | roam-render)+ <'}}'>
-     latex       =  <'$$'> !whitespace (!'$$' any-char)+ <'$$'>
-
-     (* characters and tokens *)
-     <alphanumeric>  = #'[a-zA-Z0-9]'
-     <normal-char>   = !(special-char | space-char | newline) any-char
-     <special-char>  = '**' | '__' | '^^' | '`' | '[' | ']' | '!' | '{{' | '}}' | '$$' | '((' | '))'
-     <space-char>    = ' ' | '\\t'
-     <nonspace-char> = !space-char !newline any-char
-     <newline>       = '\\n' | '\\r' '\\n'?
-     <any-char>      = #'.'
-     <sp>            = space-char*
-     <spnl>          = sp (newline sp)?
-     "))
+  (insta/parser (slurp "roam.ebnf")))
 
 (defn join-consec-strings [xs]
   (reduce (fn [x y]
@@ -89,10 +46,14 @@ Recursive:
     ;  :link (fn [& children] [:link (join-consec-strings children)])}
     (apply insta/parses parser s args)))
 
+(defn -main []
+  (time (pprint (parse "[an alias [[link[[[[ **bold**](url)" :unhide :all))))
+
 (deftest test-parse
   ; (is (= (parse "[alias](url)") ["foo"]))
   ; (is (= (parse "[alias]([[page]])") ["foo"]))
-  (is (= (parse roam-text) []))
+  (is (= (parse "[an alias [[link] **bold**](url)") []))
+  ; (is (= (parse "[[link[[deeply[[nested") []))
   ; (is (= (parse "_~~**strike** through~~_\nfoo") ["foo"]))
   ; (is (= (parse "\n\n\n  alkwejr \n ") ["foo"]))
   )
